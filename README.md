@@ -1,10 +1,10 @@
-# Generator-KV / SmartMktKV-Codex
+﻿# Generator-KV / SoloMktKV-Codex
 
 Generator-KV is a Codex plugin from SoloMkt-KV for creating marketing KV poster images through natural-language conversation. It always fetches the current SoloMkt-KV model list before generation, asks the user to choose a model, collects required event information, and calls the KV generation API with a 10-minute timeout.
 
 Generator-KV 是 SoloMkt-KV 提供的 Codex 插件，用于通过自然语言对话生成营销活动 KV 主视觉图片。插件每次生成前都会先请求模型列表接口，让用户选择模型，然后收集活动必填信息，并以 10 分钟超时时间调用 KV 生成接口。
 
-Repository: https://github.com/SoloMkt-KV/SmartMktKV-Codex.git  
+Repository: https://github.com/SoloMkt-KV/SoloMktKV-Codex.git  
 Marketplace name: `SoloMkt-KV`  
 Plugin name: `generator-kv`  
 Display name: `Generator-KV`
@@ -30,7 +30,7 @@ Display name: `Generator-KV`
 From the GitHub marketplace source:
 
 ```bash
-codex plugin marketplace add SoloMkt-KV/SmartMktKV-Codex
+codex plugin marketplace add SoloMkt-KV/SoloMktKV-Codex
 ```
 
 Then open Codex, run `/plugins`, select the `SoloMkt-KV` marketplace, and install `Generator-KV`.
@@ -38,7 +38,7 @@ Then open Codex, run `/plugins`, select the `SoloMkt-KV` marketplace, and instal
 通过 GitHub 插件市场源安装：
 
 ```bash
-codex plugin marketplace add SoloMkt-KV/SmartMktKV-Codex
+codex plugin marketplace add SoloMkt-KV/SoloMktKV-Codex
 ```
 
 然后在 Codex 中运行 `/plugins`，进入 `SoloMkt-KV` 插件市场并安装 `Generator-KV`。

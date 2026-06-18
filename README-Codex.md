@@ -1,15 +1,15 @@
-# SmartMktKV Codex 插件文档
+﻿# SmartMktKV Codex 插件文档
 
 SmartMktKV Codex Plugin 是一个用于生成营销活动 KV 主视觉图的 Codex 插件。用户可以在 Codex 中通过自然语言完成 API Key 配置、模型选择、活动信息补全和图片生成。
 
-GitHub 仓库：[SoloMkt-KV/SmartMktKV-Codex](https://github.com/SoloMkt-KV/SmartMktKV-Codex)
+GitHub 仓库：[SoloMkt-KV/SoloMktKV-Codex](https://github.com/SoloMkt-KV/SoloMktKV-Codex)
 
 ## 快速开始
 
 添加插件市场源：
 
 ```bash
-codex plugin marketplace add SoloMkt-KV/SmartMktKV-Codex
+codex plugin marketplace add SoloMkt-KV/SoloMktKV-Codex
 ```
 
 然后在 Codex 中：
@@ -27,7 +27,7 @@ codex plugin marketplace add SoloMkt-KV/SmartMktKV-Codex
 | Marketplace name | `SoloMkt-KV` |
 | Plugin name | `generator-kv` |
 | Display name | `Generator-KV` |
-| Repository | `https://github.com/SoloMkt-KV/SmartMktKV-Codex.git` |
+| Repository | `https://github.com/SoloMkt-KV/SoloMktKV-Codex.git` |
 | Main skill | `plugins/generator-kv/skills/generator-kv/SKILL.md` |
 | Helper script | `plugins/generator-kv/scripts/solomkt_kv.py` |
 
@@ -46,7 +46,7 @@ codex plugin marketplace add SoloMkt-KV/SmartMktKV-Codex
 
 - 已安装并可使用 Codex。
 - Codex 环境中可运行 Python 3。
-- 拥有有效的 SoloMkt-KV / SmartKV API Key。
+- 拥有有效的 SoloMkt-KV / SoloMkt-KV API Key。
 - 当前网络可以访问 SoloMkt-KV 后端。
 
 默认 API Base URL：
@@ -60,7 +60,7 @@ https://solosmart-uat.issmart.com.cn/solomkt_kv/api/v1
 ### 通过 GitHub 插件市场安装
 
 ```bash
-codex plugin marketplace add SoloMkt-KV/SmartMktKV-Codex
+codex plugin marketplace add SoloMkt-KV/SoloMktKV-Codex
 ```
 
 添加完成后，打开 Codex 的 `/plugins`，进入 `SoloMkt-KV` 插件市场并安装 `Generator-KV`。

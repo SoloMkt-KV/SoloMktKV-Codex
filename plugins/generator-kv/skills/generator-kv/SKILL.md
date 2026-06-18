@@ -36,7 +36,7 @@ If the user asks how to install the plugin, explain:
 1. Install the marketplace from the GitHub repository:
 
 ```bash
-codex plugin marketplace add SoloMkt-KV/SmartMktKV-Codex
+codex plugin marketplace add SoloMkt-KV/SoloMktKV-Codex
 ```
 
 2. Open Codex plugin management with `/plugins`.
