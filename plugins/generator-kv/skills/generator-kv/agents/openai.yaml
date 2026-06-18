@@ -1,0 +1,5 @@
+interface:
+  display_name: "Generator-KV"
+  short_description: "Generate SoloMkt-KV marketing key visuals."
+  default_prompt: "Use $generator-kv to configure my API key and generate an event KV."
+  brand_color: "#2563EB"

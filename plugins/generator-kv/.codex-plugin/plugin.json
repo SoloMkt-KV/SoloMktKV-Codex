@@ -1,0 +1,39 @@
+{
+  "name": "generator-kv",
+  "version": "0.1.0",
+  "description": "Generate SmartMkt KV poster images from SoloMkt-KV models through a guided Codex workflow.",
+  "author": {
+    "name": "SoloMkt-KV",
+    "url": "https://github.com/SoloMkt-KV"
+  },
+  "homepage": "https://github.com/SoloMkt-KV/SmartMktKV-Codex",
+  "repository": "https://github.com/SoloMkt-KV/SmartMktKV-Codex.git",
+  "license": "MIT",
+  "keywords": [
+    "kv",
+    "poster",
+    "marketing",
+    "solomkt",
+    "generation"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Generator-KV",
+    "shortDescription": "Generate SoloMkt-KV marketing key visuals from Codex.",
+    "longDescription": "Generator-KV guides users through API key setup, fetches available SoloMkt-KV models before every generation request, collects required activity details, and calls the KV generation API with a 10-minute timeout.",
+    "developerName": "SoloMkt-KV",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Network",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/SoloMkt-KV/SmartMktKV-Codex",
+    "defaultPrompt": [
+      "帮我生成一张活动 KV 主视觉",
+      "Configure my SoloMkt-KV API key",
+      "List SoloMkt-KV models before generation"
+    ],
+    "brandColor": "#2563EB"
+  }
+}

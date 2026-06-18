@@ -1,0 +1,20 @@
+{
+  "name": "SoloMkt-KV",
+  "interface": {
+    "displayName": "SoloMkt-KV"
+  },
+  "plugins": [
+    {
+      "name": "generator-kv",
+      "source": {
+        "source": "local",
+        "path": "./plugins/generator-kv"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
