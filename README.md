@@ -76,7 +76,7 @@ Example credential file:
 ```json
 {
   "schemaVersion": 1,
-  "baseUrl": "https://solosmart-uat.issmart.com.cn/solomkt_kv/api/v1",
+  "baseUrl": "https://api.kv.solomarketing.com.cn/api/v1",
   "apiKey": "your-api-key"
 }
 ```
@@ -191,14 +191,14 @@ Required generation fields / 生成必填字段：
 Model list:
 
 ```http
-GET https://solosmart-uat.issmart.com.cn/solomkt_kv/api/v1/models?type=all
+GET https://api.kv.solomarketing.com.cn/api/v1/models?type=all
 x-api-key: <api-key>
 ```
 
 Generate KV:
 
 ```http
-POST https://solosmart-uat.issmart.com.cn/solomkt_kv/api/v1/generateKV
+POST https://api.kv.solomarketing.com.cn/api/v1/generateKV
 x-api-key: <api-key>
 content-type: application/json
 ```

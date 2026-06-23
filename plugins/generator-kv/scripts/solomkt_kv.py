@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_BASE_URL = "https://solosmart-uat.issmart.com.cn/solomkt_kv/api/v1"
+DEFAULT_BASE_URL = "https://api.kv.solomarketing.com.cn/api/v1"
 DEFAULT_HOME = Path.home() / ".solomkt-kv"
 DEFAULT_TIMEOUT_SECONDS = 600
 

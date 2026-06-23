@@ -52,7 +52,7 @@ codex plugin marketplace add SoloMkt-KV/SoloMktKV-Codex
 默认 API Base URL：
 
 ```text
-https://solosmart-uat.issmart.com.cn/solomkt_kv/api/v1
+https://api.kv.solomarketing.com.cn/api/v1
 ```
 
 ## 安装方式
@@ -106,7 +106,7 @@ $SoloMkt-KV_HOME/.credentials.json
 ```json
 {
   "schemaVersion": 1,
-  "baseUrl": "https://solosmart-uat.issmart.com.cn/solomkt_kv/api/v1",
+  "baseUrl": "https://api.kv.solomarketing.com.cn/api/v1",
   "apiKey": "your-api-key"
 }
 ```
@@ -211,14 +211,14 @@ posterSize: ["16:9"]
 模型列表：
 
 ```http
-GET https://solosmart-uat.issmart.com.cn/solomkt_kv/api/v1/models?type=all
+GET https://api.kv.solomarketing.com.cn/api/v1/models?type=all
 x-api-key: <api-key>
 ```
 
 生成 KV：
 
 ```http
-POST https://solosmart-uat.issmart.com.cn/solomkt_kv/api/v1/generateKV
+POST https://api.kv.solomarketing.com.cn/api/v1/generateKV
 x-api-key: <api-key>
 content-type: application/json
 ```
