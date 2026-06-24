@@ -357,14 +357,4 @@ codex plugin marketplace remove SoloMkt-KV
 
 或删除你通过 `SOLOMKT_KV_HOME` 指定目录下的 `.credentials.json`。
 
-## 从 OpenClaw 迁移
-
-OpenClaw 版本使用类似下面的配置命令：
-
-```bash
-openclaw config set plugins.com.lilywlj.kvv1.apiKey YOUR_API_KEY
-openclaw config set plugins.com.lilywlj.kvv1.baseUrl http://1.94.23.191:8080/api/v1
-```
-
-Codex 插件不使用 `openclaw config`。它通过 Codex skill 工作流和 `solomkt_kv.py` helper 脚本完成配置，并把凭据保存在本地 `.credentials.json` 中。
 
