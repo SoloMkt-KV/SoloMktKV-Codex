@@ -1,259 +1,409 @@
-﻿# Generator-KV / SoloMktKV-Codex
+# SoloMktKV Codex 插件文档
 
-Generator-KV is a Codex plugin from SoloMkt-KV for creating marketing KV poster images through natural-language conversation. It always fetches the current SoloMkt-KV model list before generation, asks the user to choose a model, collects required event information, and calls the KV generation API with a 10-minute timeout.
+SoloMktKV Codex Plugin 是一个用于生成营销活动 KV 主视觉图的 Codex 插件。用户可以在 Codex 中通过自然语言完成 API Key 配置、模型选择、活动信息补全和图片生成。
 
-Generator-KV 是 SoloMkt-KV 提供的 Codex 插件，用于通过自然语言对话生成营销活动 KV 主视觉图片。插件每次生成前都会先请求模型列表接口，让用户选择模型，然后收集活动必填信息，并以 10 分钟超时时间调用 KV 生成接口。
+GitHub 仓库：[SoloMkt-KV/SoloMktKV-Codex](https://github.com/SoloMkt-KV/SoloMktKV-Codex)
 
-Repository: https://github.com/SoloMkt-KV/SoloMktKV-Codex.git  
-Marketplace name: `SoloMkt-KV`  
-Plugin name: `generator-kv`  
-Display name: `Generator-KV`
+## 快速开始
 
-## Features / 功能
-
-- Fetches models before every generation request.
-- Lets the user choose the model ID from the latest model list.
-- Guides API key setup and validates the key through the model API.
-- Saves credentials to `$SoloMkt-KV_HOME/.credentials.json`; also supports `SOLOMKT_KV_HOME`.
-- Calls `POST /generateKV` with a 600-second timeout and friendly waiting messages.
-- Supports natural-language usage in Codex.
-
-- 每次生成前都会先查询可用模型。
-- 基于最新模型列表引导用户选择模型 ID。
-- 支持 API Key 配置引导，并通过模型接口自动校验。
-- 凭据保存到 `$SoloMkt-KV_HOME/.credentials.json`，同时兼容 `SOLOMKT_KV_HOME`。
-- 调用 `POST /generateKV` 时使用 600 秒超时，并向用户提示生成可能耗时较久。
-- 默认通过 Codex 自然语言对话使用。
-
-## Install / 安装
-
-From the GitHub marketplace source:
+添加插件市场源：
 
 ```bash
 codex plugin marketplace add SoloMkt-KV/SoloMktKV-Codex
 ```
 
-Then open Codex, run `/plugins`, select the `SoloMkt-KV` marketplace, and install `Generator-KV`.
+然后在 Codex 中：
 
-通过 GitHub 插件市场源安装：
+1. 运行 `/plugins`。
+2. 选择 `SoloMkt-KV` 插件市场。
+3. 安装 `Generator-KV`。
+4. 对 Codex 说：`帮我配置 Generator-KV API Key`。
+5. 配置成功后，对 Codex 说：`帮我生成一张活动 KV 主视觉图`。
+
+## 插件信息
+
+| 项目 | 值 |
+|---|---|
+| Marketplace name | `SoloMkt-KV` |
+| Plugin name | `generator-kv` |
+| Display name | `Generator-KV` |
+| Repository | `https://github.com/SoloMkt-KV/SoloMktKV-Codex.git` |
+| Main skill | `plugins/generator-kv/skills/generator-kv/SKILL.md` |
+| Helper script | `plugins/generator-kv/scripts/solomkt_kv.py` |
+
+## 功能概览
+
+插件会引导 Codex 完成以下流程：
+
+1. 检查 SoloMkt-KV API Key 是否已配置。
+2. 每次生成前调用模型列表接口，获取最新可用模型。
+3. 展示模型列表，并让用户选择一个模型。
+4. 收集活动名称、主题、时间、地点等必填信息。
+5. 调用 KV 生成接口，最长等待 10 分钟。
+6. 返回生成后的图片 URL。
+
+## 运行要求
+
+- 已安装并可使用 Codex。
+- Codex 环境中可运行 Python 3。
+- 拥有有效的 SoloMkt-KV API Key。
+- 当前网络可以访问 SoloMkt-KV 后端。
+
+默认 API Base URL：
+
+```text
+https://kv.solomarketing.com.cn/api/v1
+```
+
+## 安装方式
+
+### 通过 GitHub 插件市场安装
 
 ```bash
 codex plugin marketplace add SoloMkt-KV/SoloMktKV-Codex
 ```
 
-然后在 Codex 中运行 `/plugins`，进入 `SoloMkt-KV` 插件市场并安装 `Generator-KV`。
+添加完成后，打开 Codex 的 `/plugins`，进入 `SoloMkt-KV` 插件市场并安装 `Generator-KV`。
 
-For local development, clone this repository and open Codex from the repository root. Codex can discover the repo-local marketplace at `.agents/plugins/marketplace.json`.
+### 本地开发安装
 
-本地开发时，克隆本仓库并从仓库根目录启动 Codex。Codex 可以发现仓库内置插件市场文件 `.agents/plugins/marketplace.json`。
-
-## API Key Setup / API Key 配置
-
-Generator-KV follows the same credential-home pattern used by Codex plugins such as mem9: credentials are stored in the plugin home instead of being kept in chat history. Configure the API key before generation, or provide it when Codex asks and Codex will save and validate it for you. Reference: https://github.com/mem9-ai/mem9/blob/main/codex-plugin/README.md
-
-Generator-KV 参考 mem9 Codex 插件的凭据目录模式：API Key 会保存在插件 Home 目录中，而不是保存在对话历史里。你可以先手动配置，也可以在使用时把 API Key 提供给 Codex，让 Codex 自动写入并校验。参考文档：https://github.com/mem9-ai/mem9/blob/main/codex-plugin/README.md
-
-Credential file:
+如果你正在本地开发这个仓库，可以从仓库根目录启动 Codex。Codex 会读取本地插件市场文件：
 
 ```text
-$SoloMkt-KV_HOME/.credentials.json
+.agents/plugins/marketplace.json
 ```
 
-Because environment variables with hyphens are awkward in some shells, the helper also supports:
+该 marketplace 指向本地插件目录：
 
 ```text
-$SOLOMKT_KV_HOME/.credentials.json
+./plugins/generator-kv
 ```
 
-If neither variable is set, the default path is:
+## API Key 配置
+
+插件会把 API Key 保存在本地凭据文件中，不会把密钥保存在对话历史里。
+
+默认凭据路径：
 
 ```text
 ~/.solomkt-kv/.credentials.json
 ```
 
-Example credential file:
+也可以通过环境变量指定凭据目录：
+
+```text
+$SOLOMKT_KV_HOME/.credentials.json
+```
+
+为了兼容插件名称，helper 脚本也支持：
+
+```text
+$SoloMkt-KV_HOME/.credentials.json
+```
+
+凭据文件示例：
 
 ```json
 {
   "schemaVersion": 1,
-  "baseUrl": "https://api.kv.solomarketing.com.cn/api/v1",
+  "baseUrl": "https://kv.solomarketing.com.cn/api/v1",
   "apiKey": "your-api-key"
 }
 ```
 
-### Configure with Codex / 使用 Codex 自动配置
+### 通过 Codex 自动配置
 
-After installing the plugin, ask Codex:
+安装插件后，直接对 Codex 说：
 
 ```text
 帮我配置 Generator-KV API Key
 ```
 
-or:
+或：
 
 ```text
 Configure my SoloMkt-KV API key
 ```
 
-Codex will ask for the key, write `.credentials.json`, call the model-list API to validate it, and then explain how to generate a KV.
+Codex 会询问 API Key，写入 `.credentials.json`，并调用模型列表接口进行校验。
 
-安装插件后，可以直接对 Codex 说：
+### 手动配置
 
-```text
-帮我配置 Generator-KV API Key
+在仓库根目录执行：
+
+```bash
+python plugins/generator-kv/scripts/solomkt_kv.py credentials-path
+python plugins/generator-kv/scripts/solomkt_kv.py configure --api-key "YOUR_API_KEY" --validate
 ```
 
-Codex 会询问 API Key，写入 `.credentials.json`，调用模型列表接口完成校验，并提示后续如何生成 KV。
-
-### Manual Paths by Environment / 不同环境与设备中的凭据地址
-
-| Environment | Default credential path | Optional home variable |
-|---|---|---|
-| macOS / Linux | `~/.solomkt-kv/.credentials.json` | `SOLOMKT_KV_HOME="$HOME/.solomkt-kv"` |
-| Windows PowerShell | `$env:USERPROFILE\.solomkt-kv\.credentials.json` | `$env:SOLOMKT_KV_HOME="$env:USERPROFILE\.solomkt-kv"` |
-| WSL | `/home/<user>/.solomkt-kv/.credentials.json` | `SOLOMKT_KV_HOME="$HOME/.solomkt-kv"` |
-| Dev Container / Codespaces | `/home/codespace/.solomkt-kv/.credentials.json` | `SOLOMKT_KV_HOME="$HOME/.solomkt-kv"` |
-| Custom shared home | `$SoloMkt-KV_HOME/.credentials.json` | Set `SoloMkt-KV_HOME` or `SOLOMKT_KV_HOME` before starting Codex |
-
-| 环境 | 默认凭据地址 | 可选 Home 变量 |
-|---|---|---|
-| macOS / Linux | `~/.solomkt-kv/.credentials.json` | `SOLOMKT_KV_HOME="$HOME/.solomkt-kv"` |
-| Windows PowerShell | `$env:USERPROFILE\.solomkt-kv\.credentials.json` | `$env:SOLOMKT_KV_HOME="$env:USERPROFILE\.solomkt-kv"` |
-| WSL | `/home/<user>/.solomkt-kv/.credentials.json` | `SOLOMKT_KV_HOME="$HOME/.solomkt-kv"` |
-| Dev Container / Codespaces | `/home/codespace/.solomkt-kv/.credentials.json` | `SOLOMKT_KV_HOME="$HOME/.solomkt-kv"` |
-| 自定义共享目录 | `$SoloMkt-KV_HOME/.credentials.json` | 启动 Codex 前设置 `SoloMkt-KV_HOME` 或 `SOLOMKT_KV_HOME` |
-
-Windows user-level setting:
-
-```powershell
-[Environment]::SetEnvironmentVariable("SOLOMKT_KV_HOME", "$env:USERPROFILE\.solomkt-kv", "User")
-```
-
-macOS / Linux shell setting:
+macOS / Linux 可以这样设置自定义凭据目录：
 
 ```bash
 export SOLOMKT_KV_HOME="$HOME/.solomkt-kv"
 ```
 
-To use the exact documented hyphenated variable for one Codex launch on macOS/Linux:
+Windows PowerShell 可以这样设置用户级环境变量：
 
-```bash
-env 'SoloMkt-KV_HOME'="$HOME/.solomkt-kv" codex
+```powershell
+[Environment]::SetEnvironmentVariable("SOLOMKT_KV_HOME", "$env:USERPROFILE\.solomkt-kv", "User")
 ```
 
-## Usage / 使用
+修改用户级环境变量后，需要重启 Codex。
 
-Natural-language examples:
+## 使用方式
+
+安装并配置 API Key 后，可以直接用自然语言让 Codex 生成 KV：
 
 ```text
-帮我生成一张活动 KV 主视觉
+帮我生成一张活动 KV 主视觉图
 ```
+
+也可以用英文：
 
 ```text
 Generate a KV poster for our product launch event
 ```
 
-The plugin workflow is:
+Codex 会按顺序完成：
 
-1. Codex checks whether the API key is configured.
-2. Codex calls `GET /models?type=all`.
-3. Codex shows the latest models and asks you to choose one.
-4. Codex asks for required fields: activity name, theme, time, and location.
-5. Codex optionally accepts prompt, poster quality, and poster size.
-6. Codex re-fetches models, confirms the selected `modelId` is still available, calls `POST /generateKV`, and waits up to 10 minutes.
-7. Codex returns the generated image URLs.
+1. 校验凭据。
+2. 请求 `GET /models?type=all`。
+3. 展示可用模型并让用户选择。
+4. 收集活动名称、活动主题、活动时间和活动地点。
+5. 可选收集额外提示词、图片质量和图片尺寸。
+6. 调用 `POST /generateKV`。
+7. 返回生成图片 URL。
 
-插件使用流程：
+## 生成参数
 
-1. Codex 检查 API Key 是否已配置。
-2. Codex 调用 `GET /models?type=all`。
-3. Codex 展示最新模型并要求你选择一个模型。
-4. Codex 询问必填字段：活动名称、活动主题、活动时间、活动地点。
-5. Codex 可选收集补充 prompt、图片质量和图片尺寸。
-6. Codex 再次查询模型，确认所选 `modelId` 仍可用，然后调用 `POST /generateKV`，最长等待 10 分钟。
-7. Codex 返回生成图片 URL。
+必填字段：
 
-Required generation fields / 生成必填字段：
-
-| Field | Required | Limit | Description |
+| 字段 | 是否必填 | 限制 | 说明 |
 |---|---:|---|---|
-| `modelId` | Yes | Non-empty | Model ID from `data.system[].id` or selected model |
-| `activityName` | Yes | 1-200 chars | Activity name |
-| `activityTheme` | Yes | 1-200 chars | Activity theme |
-| `activityTime` | Yes | 1-200 chars | Activity time |
-| `activityLocation` | Yes | 1-200 chars | Activity location |
-| `prompt` | No | 1000 chars | Extra generation requirements |
-| `posterQuality` | No | Default `2K` | Image quality |
-| `posterSize` | No | Default `["16:9"]` | Image size, passed as a string |
+| `modelId` | 是 | 非空 | 从最新模型列表中选择的模型 ID |
+| `activityName` | 是 | 1-200 字符 | 活动名称 |
+| `activityTheme` | 是 | 1-200 字符 | 活动主题 |
+| `activityTime` | 是 | 1-200 字符 | 活动时间 |
+| `activityLocation` | 是 | 1-200 字符 | 活动地点 |
 
-## APIs / 接口
+可选字段：
 
-Model list:
+| 字段 | 是否必填 | 限制 / 默认值 | 说明 |
+|---|---:|---|---|
+| `prompt` | 否 | 最多 1000 字符 | 额外画面要求 |
+| `posterQuality` | 否 | 默认 `2K` | 图片质量 |
+| `posterSize` | 否 | 默认 `["16:9"]` | 图片尺寸，按字符串传入 |
+
+示例：
+
+```text
+activityName: 春季新品发布会
+activityTheme: 科技新品与智慧生活
+activityTime: 2026年6月28日
+activityLocation: 上海
+prompt: 画面风格高级、明亮、有舞台灯光，突出新品发布氛围
+posterQuality: 2K
+posterSize: ["16:9"]
+```
+
+## API Reference
+
+模型列表：
 
 ```http
-GET https://api.kv.solomarketing.com.cn/api/v1/models?type=all
+GET https://kv.solomarketing.com.cn/api/v1/models?type=all
 x-api-key: <api-key>
 ```
 
-Generate KV:
+生成 KV：
 
 ```http
-POST https://api.kv.solomarketing.com.cn/api/v1/generateKV
+POST https://kv.solomarketing.com.cn/api/v1/generateKV
 x-api-key: <api-key>
 content-type: application/json
 ```
 
-## Uninstall / 卸载
+请求体示例：
 
-In Codex, run `/plugins`, open `Generator-KV`, and uninstall it.
+```json
+{
+  "modelId": "1001",
+  "activityName": "春季新品发布会",
+  "activityTheme": "科技新品与智慧生活",
+  "activityTime": "2026年6月28日",
+  "activityLocation": "上海",
+  "prompt": "画面风格高级、明亮、有舞台灯光，突出新品发布氛围",
+  "posterQuality": "2K",
+  "posterSize": "[\"16:9\"]"
+}
+```
 
-To remove the marketplace:
+### 错误处理与自动修复
+
+调用 `POST /api/v1/generateKV` 时，如果服务端返回错误，响应体结构如下：
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "GENERATION_ENCODING_ERROR",
+    "message": "...",
+    "details": {
+      "fieldName": "activityName",
+      "reason": "...",
+      "suggestion": "...",
+      "rejectedValue": null
+    }
+  }
+}
+```
+
+模型必须根据 `error.code` 自动执行修复后重试，不要直接向用户展示原始错误。
+
+| 错误码 | 含义 | 自动修复动作 |
+|---|---|---|
+| `GENERATION_ENCODING_ERROR` | 请求体包含非 UTF-8 编码字符 | 按 `fieldName` 定位字段，将其值转换为 UTF-8 编码，确保请求头 `Content-Type: application/json; charset=utf-8` 后重试 |
+| `GENERATION_JSON_PARSE_ERROR` | JSON 格式错误 | 检查请求体 JSON 语法、字段引号、字段类型后重试 |
+| `GENERATION_FIELD_REQUIRED` | 必填字段缺失 | 按 `fieldName` 提示用户补全该字段，获取值后重试 |
+| `GENERATION_FIELD_TOO_LONG` | 字段长度超限 | 按 `fieldName` 缩短字段值至规定长度以内后重试 |
+| `INVALID_MODEL` | `modelId` 无效 | 调用 `GET /api/v1/models?type=all` 重新获取模型列表，让用户选择有效模型后重试 |
+| `QUOTA_EXCEEDED` | 额度不足 | 停止重试，向用户说明当日额度已用完，建议次日重试或联系管理员 |
+| `UNAUTHORIZED` | `x-api-key` 无效 | 停止重试，引导用户检查或重新配置 API Key |
+| `INTERNAL_ERROR` | 服务器内部错误 | 最多重试 2 次；仍失败则向用户报告并停止 |
+
+自动修复原则：
+- 优先读取 `error.details.suggestion`，按其指引执行。
+- 修复后必须重新调用 `POST /api/v1/generateKV`，并保持 `x-api-key` 不变。
+- 不要修改 `x-api-key` 和其他有效字段。
+- 如果连续 2 次自动修复仍失败，停止重试并清晰告知用户。
+
+## Helper 脚本命令
+
+查看凭据路径：
 
 ```bash
-codex plugin marketplace remove SoloMkt-KV
+python plugins/generator-kv/scripts/solomkt_kv.py credentials-path
 ```
 
-The uninstall flow does not remove credentials automatically. To fully remove local credentials, delete:
-
-```text
-$SoloMkt-KV_HOME/.credentials.json
-```
-
-在 Codex 中运行 `/plugins`，打开 `Generator-KV` 并卸载。
-
-如需移除插件市场：
+配置并校验凭据：
 
 ```bash
-codex plugin marketplace remove SoloMkt-KV
+python plugins/generator-kv/scripts/solomkt_kv.py configure --api-key "YOUR_API_KEY" --validate
 ```
 
-卸载插件不会自动删除凭据。如需彻底移除本地凭据，请删除：
+检查凭据：
 
-```text
-$SoloMkt-KV_HOME/.credentials.json
+```bash
+python plugins/generator-kv/scripts/solomkt_kv.py check-credentials --validate
 ```
 
-## Development / 开发
+列出可用模型：
 
-Validate the plugin:
+```bash
+python plugins/generator-kv/scripts/solomkt_kv.py models
+```
+
+手动生成 KV：
+
+```bash
+python plugins/generator-kv/scripts/solomkt_kv.py generate \
+  --model-id "1001" \
+  --activity-name "春季新品发布会" \
+  --activity-theme "科技新品与智慧生活" \
+  --activity-time "2026年6月28日" \
+  --activity-location "上海" \
+  --prompt "画面风格高级、明亮、有舞台灯光，突出新品发布氛围" \
+  --poster-quality "2K" \
+  --poster-size "[\"16:9\"]" \
+  --timeout 600
+```
+
+## 开发与校验
+
+校验插件包：
 
 ```bash
 python ~/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py plugins/generator-kv
 ```
 
-Validate the skill:
+校验 skill：
 
 ```bash
 python ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py plugins/generator-kv/skills/generator-kv
 ```
 
-Test the helper:
+测试 helper 脚本：
 
 ```bash
 python plugins/generator-kv/scripts/solomkt_kv.py credentials-path
 python plugins/generator-kv/scripts/solomkt_kv.py models
 ```
 
-## License / 许可证
+## 安全注意事项
 
-MIT
+- 不要把真实 API Key 写入 README、issue、commit 或聊天记录。
+- 不要提交 `.credentials.json`。
+- 如果 API Key 泄露，应立即在服务端吊销旧 key 并重新生成。
+- 文档示例中的 `YOUR_API_KEY` 和 `your-api-key` 都是占位符。
+
+## 常见问题
+
+### Codex 提示没有配置 API Key
+
+先运行：
+
+```bash
+python plugins/generator-kv/scripts/solomkt_kv.py credentials-path
+```
+
+确认凭据文件路径，然后重新配置：
+
+```bash
+python plugins/generator-kv/scripts/solomkt_kv.py configure --api-key "YOUR_API_KEY" --validate
+```
+
+### 生成前为什么总是重新获取模型列表
+
+模型可能会更新、下线或新增。插件每次生成前重新请求模型列表，可以避免使用过期的 `modelId`。
+
+### 生成图片为什么需要等待较久
+
+KV 图片生成可能需要几分钟。插件默认生成请求超时时间是 600 秒，也就是 10 分钟。
+
+### 返回 selected modelId 不存在
+
+这说明当前选择的模型 ID 不在最新模型列表里。重新让 Codex 列出模型，并选择新的模型 ID。
+
+## 卸载
+
+在 Codex 中：
+
+1. 运行 `/plugins`。
+2. 打开 `Generator-KV`。
+3. 卸载插件。
+
+移除插件市场源：
+
+```bash
+codex plugin marketplace remove SoloMkt-KV
+```
+
+卸载插件不会自动删除本地凭据。如果要彻底移除配置，请删除：
+
+```text
+~/.solomkt-kv/.credentials.json
+```
+
+或删除你通过 `SOLOMKT_KV_HOME` 指定目录下的 `.credentials.json`。
+
+## 从 OpenClaw 迁移
+
+OpenClaw 版本使用类似下面的配置命令：
+
+```bash
+openclaw config set plugins.com.lilywlj.kvv1.apiKey YOUR_API_KEY
+openclaw config set plugins.com.lilywlj.kvv1.baseUrl https://kv.solomarketing.com.cn/api/v1
+```
+
+Codex 插件不使用 `openclaw config`。它通过 Codex skill 工作流和 `solomkt_kv.py` helper 脚本完成配置，并把凭据保存在本地 `.credentials.json` 中。
+
