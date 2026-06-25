@@ -52,7 +52,7 @@ codex plugin marketplace add SoloMkt-KV/SoloMktKV-Codex
 默认 API Base URL：
 
 ```text
-https://api.kv.solomarketing.com.cn/api/v1
+https://kv.solomarketing.com.cn/api/v1
 ```
 
 ## 安装方式
@@ -106,7 +106,7 @@ $SoloMkt-KV_HOME/.credentials.json
 ```json
 {
   "schemaVersion": 1,
-  "baseUrl": "https://api.kv.solomarketing.com.cn/api/v1",
+  "baseUrl": "https://kv.solomarketing.com.cn/api/v1",
   "apiKey": "your-api-key"
 }
 ```
@@ -211,14 +211,14 @@ posterSize: ["16:9"]
 模型列表：
 
 ```http
-GET https://api.kv.solomarketing.com.cn/api/v1/models?type=all
+GET https://kv.solomarketing.com.cn/api/v1/models?type=all
 x-api-key: <api-key>
 ```
 
 生成 KV：
 
 ```http
-POST https://api.kv.solomarketing.com.cn/api/v1/generateKV
+POST https://kv.solomarketing.com.cn/api/v1/generateKV
 x-api-key: <api-key>
 content-type: application/json
 ```
@@ -237,6 +237,45 @@ content-type: application/json
   "posterSize": "[\"16:9\"]"
 }
 ```
+
+### 错误处理与自动修复
+
+调用 `POST /api/v1/generateKV` 时，如果服务端返回错误，响应体结构如下：
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "GENERATION_ENCODING_ERROR",
+    "message": "...",
+    "details": {
+      "fieldName": "activityName",
+      "reason": "...",
+      "suggestion": "...",
+      "rejectedValue": null
+    }
+  }
+}
+```
+
+模型必须根据 `error.code` 自动执行修复后重试，不要直接向用户展示原始错误。
+
+| 错误码 | 含义 | 自动修复动作 |
+|---|---|---|
+| `GENERATION_ENCODING_ERROR` | 请求体包含非 UTF-8 编码字符 | 按 `fieldName` 定位字段，将其值转换为 UTF-8 编码，确保请求头 `Content-Type: application/json; charset=utf-8` 后重试 |
+| `GENERATION_JSON_PARSE_ERROR` | JSON 格式错误 | 检查请求体 JSON 语法、字段引号、字段类型后重试 |
+| `GENERATION_FIELD_REQUIRED` | 必填字段缺失 | 按 `fieldName` 提示用户补全该字段，获取值后重试 |
+| `GENERATION_FIELD_TOO_LONG` | 字段长度超限 | 按 `fieldName` 缩短字段值至规定长度以内后重试 |
+| `INVALID_MODEL` | `modelId` 无效 | 调用 `GET /api/v1/models?type=all` 重新获取模型列表，让用户选择有效模型后重试 |
+| `QUOTA_EXCEEDED` | 额度不足 | 停止重试，向用户说明当日额度已用完，建议次日重试或联系管理员 |
+| `UNAUTHORIZED` | `x-api-key` 无效 | 停止重试，引导用户检查或重新配置 API Key |
+| `INTERNAL_ERROR` | 服务器内部错误 | 最多重试 2 次；仍失败则向用户报告并停止 |
+
+自动修复原则：
+- 优先读取 `error.details.suggestion`，按其指引执行。
+- 修复后必须重新调用 `POST /api/v1/generateKV`，并保持 `x-api-key` 不变。
+- 不要修改 `x-api-key` 和其他有效字段。
+- 如果连续 2 次自动修复仍失败，停止重试并清晰告知用户。
 
 ## Helper 脚本命令
 
@@ -357,4 +396,14 @@ codex plugin marketplace remove SoloMkt-KV
 
 或删除你通过 `SOLOMKT_KV_HOME` 指定目录下的 `.credentials.json`。
 
+## 从 OpenClaw 迁移
+
+OpenClaw 版本使用类似下面的配置命令：
+
+```bash
+openclaw config set plugins.com.lilywlj.kvv1.apiKey YOUR_API_KEY
+openclaw config set plugins.com.lilywlj.kvv1.baseUrl https://kv.solomarketing.com.cn/api/v1
+```
+
+Codex 插件不使用 `openclaw config`。它通过 Codex skill 工作流和 `solomkt_kv.py` helper 脚本完成配置，并把凭据保存在本地 `.credentials.json` 中。
 
